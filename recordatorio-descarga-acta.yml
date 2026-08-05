@@ -1,0 +1,41 @@
+name: Recordatorio descarga y actualizacion del acta
+
+on:
+  schedule:
+    # 13:00 UTC = 8:00 a.m. hora de Bogota (UTC-5). Ajusta la hora si lo necesitas.
+    # Este cron corre de lunes a viernes; quita el "1-5" y deja "*" si quieres que sea diario todos los dias.
+    - cron: "0 13 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "todos = prueba enviando a TODA la lista | rotacion = solo la persona del turno de hoy"
+        required: true
+        default: "rotacion"
+        type: choice
+        options:
+          - rotacion
+          - todos
+
+jobs:
+  enviar-recordatorio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Enviar recordatorio (correo + Google Chat)
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+          FECHA_INICIO_ROTACION: "2026-01-01"
+          MODO: ${{ github.event.inputs.modo || 'rotacion' }}
+        run: python scripts/enviar_recordatorio.py
