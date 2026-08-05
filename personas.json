@@ -1,4 +1,13 @@
 [
-  "william_estrada@cun.edu.co",
-  "elkin_rodriguezca@cun.edu.co"
+  { "nombre": "Gillyam German Martinez Bernal", "correo": "gillyam_martinez@cun.edu.co" },
+  { "nombre": "Angela Rocio Camargo Puerto", "correo": "angela_camargop@cun.edu.co" },
+  { "nombre": "William Estrada Santis", "correo": "william_estrada@cun.edu.co" },
+  { "nombre": "Elkin Ignacio Rodriguez Carrero", "correo": "elkin_rodriguezca@cun.edu.co" },
+  { "nombre": "Johana Alfonsina Caicedo Osorio", "correo": "johana_caicedo@cun.edu.co" },
+  { "nombre": "Laura Daniela Gomez Arenas", "correo": "laura_gomeza@cun.edu.co" },
+  { "nombre": "Andres Camilo Vasquez Blanco", "correo": "andres_vasquez@cun.edu.co" },
+  { "nombre": "Heidy Johanna Quiroga Aguilar", "correo": "heidy_quiroga@cun.edu.co" },
+  { "nombre": "Cristian Felipe Galindo Acero", "correo": "cristian_galindoa@cun.edu.co" },
+  { "nombre": "Julio Andres Pamplona Llanos", "correo": "julio_pamplona@cun.edu.co" },
+  { "nombre": "Maira Alejandra Doncel Largo", "correo": "maira_doncel@cun.edu.co" }
 ]
