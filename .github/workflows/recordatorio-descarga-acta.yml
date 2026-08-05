@@ -36,6 +36,6 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
-          FECHA_INICIO_ROTACION: "2026-01-01"
+          FECHA_INICIO_ROTACION: "2026-08-06"
           MODO: ${{ github.event.inputs.modo || 'rotacion' }}
         run: python scripts/enviar_recordatorio.py
