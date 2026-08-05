@@ -28,27 +28,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PERSONAS_PATH = BASE_DIR / "personas.json"
 
 
-def nombre_desde_correo(correo):
-    """
-    Convierte 'william_estrada@cun.edu.co' en 'William Estrada'.
-    Soporta separadores '_' y '.' entre nombre y apellido.
-    """
-    usuario = correo.split("@")[0]
-    partes = usuario.replace(".", "_").split("_")
-    return " ".join(p.capitalize() for p in partes if p)
-
-
 def cargar_personas():
     """
-    personas.json es simplemente una lista de correos, por ejemplo:
-    ["william_estrada@cun.edu.co", "elkin_rodriguezca@cun.edu.co"]
-    El nombre se deriva automaticamente del correo.
+    personas.json es una lista de objetos {"nombre": ..., "correo": ...}
+    en el orden exacto en que deben rotar.
     """
     with open(PERSONAS_PATH, "r", encoding="utf-8") as f:
-        correos = json.load(f)
-    if not correos:
+        personas = json.load(f)
+    if not personas:
         raise ValueError("personas.json esta vacio")
-    return [{"nombre": nombre_desde_correo(c), "correo": c} for c in correos]
+    return personas
 
 
 def calcular_turno(personas):
@@ -71,7 +60,7 @@ def construir_mensaje(persona):
     cuerpo = (
         f"Hola {persona['nombre']},\n\n"
         "hoy te corresponde realizar la descarga y actualizacion del acta.\n\n"
-        "Muchas gracias por tus servicios :)\n"
+        "Muchas gracias por tu colaboracion :)\n"
     )
     return asunto, cuerpo
 
