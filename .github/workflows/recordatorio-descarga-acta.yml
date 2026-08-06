@@ -19,6 +19,7 @@ on:
 jobs:
   enviar-recordatorio:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Clonar repositorio
         uses: actions/checkout@v4
