@@ -77,10 +77,18 @@ def enviar_correo(destinatario, asunto, cuerpo):
     msg["From"] = remitente
     msg["To"] = destinatario
 
-    with smtplib.SMTP(servidor, puerto) as server:
-        server.starttls()
-        server.login(usuario, password)
-        server.sendmail(remitente, [destinatario], msg.as_string())
+    # timeout=20: si el servidor SMTP no responde en 20s, lanza error
+    # en vez de dejar el job colgado indefinidamente.
+    if puerto == 465:
+        # 465 es SSL directo (no usa starttls)
+        with smtplib.SMTP_SSL(servidor, puerto, timeout=20) as server:
+            server.login(usuario, password)
+            server.sendmail(remitente, [destinatario], msg.as_string())
+    else:
+        with smtplib.SMTP(servidor, puerto, timeout=20) as server:
+            server.starttls()
+            server.login(usuario, password)
+            server.sendmail(remitente, [destinatario], msg.as_string())
 
     print(f"Correo enviado a {destinatario}")
 
@@ -96,7 +104,7 @@ def enviar_google_chat(asunto, cuerpo):
         headers={"Content-Type": "application/json; charset=UTF-8"},
         method="POST",
     )
-    with urllib.request.urlopen(req) as resp:
+    with urllib.request.urlopen(req, timeout=20) as resp:
         print(f"Mensaje enviado a Google Chat, status {resp.status}")
 
 
