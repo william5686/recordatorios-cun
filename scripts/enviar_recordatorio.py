@@ -20,12 +20,31 @@ import os
 import smtplib
 import sys
 import urllib.request
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.mime.text import MIMEText
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PERSONAS_PATH = BASE_DIR / "personas.json"
+FESTIVOS_PATH = BASE_DIR / "festivos.json"
+
+
+def cargar_festivos():
+    """
+    festivos.json es una lista de fechas "YYYY-MM-DD" que se tratan
+    como no habiles (igual que sabado/domingo): no se envia nada ese
+    dia y no cuenta para la rotacion. Si el archivo no existe, se
+    asume que no hay festivos configurados.
+    """
+    if not FESTIVOS_PATH.exists():
+        return set()
+    with open(FESTIVOS_PATH, "r", encoding="utf-8") as f:
+        fechas = json.load(f)
+    return {datetime.strptime(f, "%Y-%m-%d").date() for f in fechas}
+
+
+def es_dia_habil(fecha, festivos):
+    return fecha.weekday() < 5 and fecha not in festivos
 
 
 def cargar_personas():
@@ -40,26 +59,36 @@ def cargar_personas():
     return personas
 
 
-def calcular_turno(personas):
+def calcular_turno(personas, festivos):
     """
-    Calcula a quien le toca hoy usando los dias transcurridos desde
-    FECHA_INICIO_ROTACION, en modulo la cantidad de personas.
-    Asi la rotacion es automatica y no depende de guardar un contador:
-    cuando llega al final de la lista, vuelve a empezar por el primero.
+    Calcula a quien le toca hoy contando solo DIAS HABILES (lunes a
+    viernes, sin festivos) transcurridos desde FECHA_INICIO_ROTACION,
+    en modulo la cantidad de personas. Se excluyen fines de semana y
+    festivos porque esos dias no se envia nada; si se contaran, la
+    rotacion se saltaria personas cada vez que hay un dia no habil.
+    Cuando llega al final de la lista, vuelve a empezar por el primero.
     """
     fecha_inicio_str = os.environ.get("FECHA_INICIO_ROTACION", "2026-01-01")
     fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
-    dias_transcurridos = (date.today() - fecha_inicio).days
-    indice = dias_transcurridos % len(personas)
+    hoy = date.today()
+
+    dias_habiles = 0
+    fecha = fecha_inicio
+    while fecha < hoy:
+        fecha += timedelta(days=1)
+        if es_dia_habil(fecha, festivos):
+            dias_habiles += 1
+
+    indice = dias_habiles % len(personas)
     return personas[indice]
 
 
 def construir_mensaje(persona):
-    asunto = "Recordatorio: descarga y actualizacion del ACA"
+    asunto = "Recordatorio: descarga y actualizacion del acta"
 
     cuerpo = (
         f"Hola {persona['nombre']},\n\n"
-        "hoy te corresponde realizar la descarga y actualizacion del ACA.\n\n"
+        "hoy te corresponde realizar la descarga y actualizacion del acta.\n\n"
         "Muchas gracias por tu colaboracion :)\n"
     )
     return asunto, cuerpo
@@ -127,16 +156,22 @@ def enviar_a_persona(persona):
 
 def main():
     personas = cargar_personas()
+    festivos = cargar_festivos()
     modo = os.environ.get("MODO", "rotacion").strip().lower()
 
     if modo == "todos":
-        # Modo de prueba: envia el recordatorio a TODAS las personas de la lista.
+        # Modo de prueba: envia el recordatorio a TODAS las personas de la lista,
+        # sin importar si hoy es festivo (para poder probar cualquier dia).
         print(f"MODO=todos -> enviando a las {len(personas)} personas de la lista")
         for persona in personas:
             enviar_a_persona(persona)
     else:
+        hoy = date.today()
+        if hoy in festivos:
+            print(f"{hoy} esta marcado como festivo en festivos.json -> no se envia nada hoy")
+            return
         # Modo normal: solo a la persona a la que le toca el turno de hoy.
-        persona = calcular_turno(personas)
+        persona = calcular_turno(personas, festivos)
         print(f"Turno de hoy: {persona['nombre']} <{persona['correo']}>")
         enviar_a_persona(persona)
 
