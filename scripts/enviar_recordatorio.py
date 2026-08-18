@@ -84,11 +84,11 @@ def calcular_turno(personas, festivos):
 
 
 def construir_mensaje(persona):
-    asunto = "Recordatorio: descarga y actualizacion del acta"
+    asunto = "Recordatorio: descarga y actualizacion del ACA"
 
     cuerpo = (
         f"Hola {persona['nombre']},\n\n"
-        "hoy te corresponde realizar la descarga y actualizacion del acta.\n\n"
+        "hoy te corresponde realizar la descarga y actualizacion del ACA.\n\n"
         "Muchas gracias por tu colaboracion :)\n"
     )
     return asunto, cuerpo
