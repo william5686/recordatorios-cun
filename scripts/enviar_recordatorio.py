@@ -90,7 +90,13 @@ def construir_mensaje(persona):
         f"Hola {persona['nombre']},\n\n"
         "hoy te corresponde realizar la descarga y actualizacion del ACA.\n\n"
         "Muchas gracias por tu colaboracion 😀\n"
-        "PD:No olvidar periodo Q 🤔\n"
+        "PD:Recuerda son los periodos:• 26V03, 26V04, 26V05
+• 26T03, 26T04, 26T05
+• 26PO3, 26P04, 26P05
+• 26P15, 26P14
+• 26104, 26105
+• 26ES3, 26ES4, 26ES5
+• 2026C, 2026D, 2026Q🤔\n"
     )
     return asunto, cuerpo
 
